@@ -120,5 +120,5 @@ Thumbs.db
 .uv/
 
 # Examples directory
-examples/Dockerfile*
-examples/helm/
+examples/**/Dockerfile*
+examples/**/helm/
