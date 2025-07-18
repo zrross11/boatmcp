@@ -7,7 +7,7 @@ from pathlib import Path
 src_path = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_path))
 
-from nlpi.main import mcp
+from boatmcp.main import mcp
 
 if __name__ == "__main__":
     mcp.run(transport='stdio')

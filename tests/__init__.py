@@ -1,1 +1,1 @@
-"""Test suite for nlpi."""
+"""Test suite for BoatMCP."""

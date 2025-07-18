@@ -1,4 +1,4 @@
-"""Services for nlpi."""
+"""Services for BoatMCP."""
 
 from .repository import RepositoryScanner, ProjectAnalyzer
 from .docker import DockerfileGenerator

@@ -1,4 +1,4 @@
-"""Schemas for nlpi project."""
+"""Schemas for BoatMCP project."""
 
 from .repository import FileInfo, ProjectAnalysis, ScanResult
 from .docker import DockerfileInstruction, DockerfileTemplate, DockerfileGenerationRequest, DockerfileGenerationResult

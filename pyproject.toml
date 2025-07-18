@@ -1,7 +1,7 @@
 [project]
-name = "nlpi"
+name = "boatmcp"
 version = "0.1.0"
-description = "Natural Language Programming Interface - MCP server for infrastructure deployment"
+description = "BoatMCP - MCP server for shipping code from local to production"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -26,7 +26,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/nlpi"]
+packages = ["src/boatmcp"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

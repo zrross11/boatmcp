@@ -4,9 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-nlpi (Natural-Language-Processed Infrastructure) is a Natural Language Programming Interface designed to function as an MCP (Model Context Protocol) server. The target users are developers who may not have deep expertise in DevOps or cloud infrastructure deployment.
+BoatMCP is an MCP (Model Context Protocol) server designed to help developers ship code from local development to production using natural language interactions with an LLM client. 
 
-The core purpose of nlpi is to allow a developer to describe their deployment goals in plain English, enabling them to go from local repository to production in the cloud while talking to the LLM. The system will interpret these requests and guide the user through the necessary steps to correctly deploy their software. This includes a wide range of tasks, from generating a Dockerfile and pushing a container image to a registry, to provisioning cloud infrastructure like a VPC in AWS. The ultimate goal is to simplify the deployment process, making it accessible and intuitive for developers at all skill levels.
+**Mission Statement:** BoatMCP's mission is to eliminate the friction between "it works on my machine" and "it works in production" by providing intelligent tooling that guides developers through deployment workflows using plain English conversations with Claude or other MCP-compatible LLMs.
+
+The core purpose of BoatMCP is to allow developers to describe their deployment goals in natural language, enabling them to go from local repository to production in the cloud through LLM-guided workflows. This includes generating Dockerfiles, building container images, provisioning cloud infrastructure, and managing Kubernetes deployments. The system interprets natural language requests and provides step-by-step guidance to deploy software correctly and efficiently.
 
 ## Development Setup
 
@@ -315,7 +317,7 @@ class ProjectSchema(BaseModel):
     updated_at: datetime
 
 # ✅ CORRECT - Import schemas from the shared schema module
-from nlpi.schemas import ProjectSchema, Project
+from boatmcp.schemas import ProjectSchema, Project
 ```
 
 ## Code Style

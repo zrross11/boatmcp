@@ -1,4 +1,4 @@
-"""Main entry point for nlpi MCP server."""
+"""Main entry point for BoatMCP server."""
 
 from fastmcp import FastMCP
 from pathlib import Path
@@ -9,7 +9,7 @@ from .schemas.docker import DockerfileGenerationRequest
 
 
 # Initialize FastMCP server
-mcp = FastMCP("nlpi")
+mcp = FastMCP("boatmcp")
 
 # Initialize services
 repository_scanner = RepositoryScanner()
@@ -160,7 +160,7 @@ async def generate_dockerfile(
 
 @mcp.tool()
 async def create_minikube_cluster(
-    profile: str = "nlpi-cluster",
+    profile: str = "boatmcp-cluster",
     cpus: int = 2,
     memory: str = "2048mb",
     disk_size: str = "20gb",

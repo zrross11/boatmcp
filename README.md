@@ -1,56 +1,61 @@
-# nlpi
-Natural-Language-Processed Infrastructure
+# BoatMCP
 
-**nlpi** is a Model Context Protocol (FastMCP) server that enables developers and DevOps engineers to create, manage, and deploy infrastructure as code using natural language. By leveraging advanced language models, nlpi transforms human-readable infrastructure requirements into production-ready Infrastructure as Code (IaC) templates.
+BoatMCP is an MCP (Model Context Protocol) server designed to help developers ship code from local development to production using natural language interactions with an LLM client.
 
-## 🚀 Features
+## 🚀 Mission Statement
 
-- **Natural Language to IaC**: Convert plain English descriptions into Terraform, CloudFormation, or other IaC formats
-- **Multi-Cloud Support**: Generate infrastructure code for AWS, Azure, Google Cloud, and other providers
-- **Interactive Refinement**: Iteratively improve and modify infrastructure definitions through conversation
-- **Best Practices Integration**: Automatically incorporates security, scalability, and cost optimization best practices
-- **Template Management**: Save, version, and reuse infrastructure patterns
-- **Validation & Testing**: Built-in validation for generated infrastructure code
+BoatMCP's mission is to eliminate the friction between "it works on my machine" and "it works in production" by providing intelligent tooling that guides developers through deployment workflows using plain English conversations with Claude or other MCP-compatible LLMs.
+
+## 🛠 Features
+
+- **Repository Analysis**: Intelligent scanning of project structure, dependencies, and configuration
+- **Dockerfile Generation**: Automated creation of optimized Dockerfiles based on project analysis
+- **Container Building**: Docker image building with intelligent defaults and optimization
+- **Kubernetes Integration**: Minikube cluster management for local development
+- **Natural Language Interface**: Describe deployment goals in plain English
+- **Best Practices**: Incorporates security, performance, and deployment best practices
 
 ## 🛠 How It Works
 
-nlpi acts as an FastMCP server that can be integrated with various AI clients and development environments. When you describe your infrastructure needs in natural language, nlpi:
+BoatMCP acts as an MCP server that integrates with Claude Desktop and other MCP-compatible clients. When you describe your deployment needs in natural language, BoatMCP:
 
-1. **Parses** your requirements using advanced NLP techniques
-2. **Translates** them into appropriate IaC syntax and structure
-3. **Validates** the generated code for syntax and best practices
-4. **Provides** explanations and suggestions for improvements
-5. **Enables** iterative refinement through follow-up conversations
+1. **Analyzes** your project structure and dependencies
+2. **Generates** appropriate infrastructure code (Dockerfiles, configs)
+3. **Builds** container images with optimized settings
+4. **Provisions** local development environments (minikube)
+5. **Guides** you through deployment workflows step-by-step
 
 ## 💡 Use Cases
 
-- **Rapid Prototyping**: Quickly spin up development environments
-- **Learning Tool**: Help newcomers understand infrastructure concepts
-- **Documentation**: Generate IaC from existing infrastructure descriptions
-- **Migration**: Convert legacy setups to modern IaC practices
-- **Standardization**: Ensure consistent infrastructure patterns across teams
+- **Rapid Deployment**: Go from local code to containerized application quickly
+- **Learning Tool**: Understand deployment concepts through guided interactions
+- **Development Environments**: Spin up consistent local Kubernetes environments
+- **CI/CD Preparation**: Generate deployment artifacts for production pipelines
+- **Standardization**: Ensure consistent deployment patterns across projects
 
 ## 🎯 Target Users
 
-- **DevOps Engineers** looking to accelerate infrastructure provisioning
-- **Developers** who need infrastructure but aren't IaC experts
-- **Platform Teams** building self-service infrastructure capabilities
-- **Students and Learners** exploring cloud infrastructure concepts
+- **Developers** who want to ship code without deep DevOps expertise
+- **Teams** looking to standardize deployment practices
+- **Students** learning container and Kubernetes technologies
+- **Anyone** who prefers natural language over complex deployment commands
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- **Python 3.12+** 
+- **Python 3.11+** (project uses 3.12+ as recommended)
 - **[uv](https://github.com/astral-sh/uv)** - Fast Python package manager
-- **[Claude Desktop](https://claude.ai/download)** - Required for local development and testing
+- **[Claude Desktop](https://claude.ai/download)** - Required for MCP client interaction
+- **Docker** - For container building functionality
+- **minikube** - For Kubernetes cluster management (optional)
 
 ### Installation & Setup
 
 1. **Clone and navigate to the project:**
    ```bash
    git clone <repository-url>
-   cd nlpi
+   cd boatmcp
    ```
 
 2. **Set up Python environment with uv:**
@@ -71,7 +76,7 @@ nlpi acts as an FastMCP server that can be integrated with various AI clients an
 
 ### Claude Desktop Configuration
 
-To use nlpi with Claude Desktop, you need to configure the FastMCP server in your Claude Desktop settings.
+To use BoatMCP with Claude Desktop, you need to configure the MCP server in your Claude Desktop settings.
 
 **Update your Claude Desktop config file:**
 
@@ -81,11 +86,11 @@ To use nlpi with Claude Desktop, you need to configure the FastMCP server in you
 ```json
 {
   "mcpServers": {
-    "infrastructure-tools": {
+    "boatmcp": {
       "command": "/Users/<username>/.local/bin/uv",
       "args": [
         "--directory",
-        "/full/path/to/your/nlpi/directory",
+        "/full/path/to/your/boatmcp/directory",
         "run",
         "main.py"
       ]
@@ -94,33 +99,43 @@ To use nlpi with Claude Desktop, you need to configure the FastMCP server in you
 }
 ```
 
-**Important:** Replace `<username>` and `/path/to/your/nlpi/directory` with real values.
+**Important:** Replace `<username>` and `/path/to/your/boatmcp/directory` with actual values.
 
 ### Usage
 
-Once configured, restart Claude Desktop and you'll have access to nlpi's infrastructure management tools through natural language commands in your Claude conversations.
+Once configured, restart Claude Desktop and you'll have access to BoatMCP's deployment tools through natural language commands in your Claude conversations.
 
 **Example commands:**
-- Create a minikube cluster with custom specifications
-- Delete specific clusters by name
-- Manage Kubernetes environments through simple requests
+- "Analyze my Python project and generate a Dockerfile"
+- "Create a minikube cluster for local development"
+- "Build a Docker image from my current project"
+- "Help me deploy this Node.js app to production"
 
 ## 🔧 Integration
 
-As an FastMCP server, nlpi can be integrated with:
-- IDEs and code editors with FastMCP support
-- CI/CD pipelines for automated infrastructure generation
-- Custom applications via the FastMCP protocol
-- Command-line tools and scripts
+As an MCP server, BoatMCP can be integrated with:
+- **Claude Desktop** for interactive deployment workflows
+- **IDEs and editors** with MCP support
+- **CI/CD pipelines** for automated deployment preparation
+- **Custom applications** via the MCP protocol
+- **Command-line tools** and scripts
 
 ## 🛠 Development
 
 The project structure:
 ```
-nlpi/
-├── main.py              # FastMCP server entrypoint
-├── app/                 # Application modules
-│   └── minikube/        # Minikube management functionality
+boatmcp/
+├── main.py              # MCP server entrypoint
+├── src/
+│   └── boatmcp/         # Main application package
+│       ├── main.py      # Core MCP server logic
+│       ├── services/    # Business logic services
+│       │   ├── repository.py   # Repository analysis
+│       │   └── docker.py      # Dockerfile generation
+│       └── schemas/     # Data schemas
+│           ├── repository.py   # Repository schemas
+│           └── docker.py      # Docker schemas
+├── tests/               # Test suite
 ├── pyproject.toml       # Project configuration
 └── uv.lock             # Dependency lock file
 ```
@@ -129,9 +144,16 @@ nlpi/
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
+3. Make your changes following TDD principles
 4. Test with `uv run main.py`
 5. Submit a pull request
+
+### Development Guidelines
+
+- Follow Test-Driven Development (TDD)
+- All code must have type hints
+- Use pytest for testing
+- Follow the existing code structure and patterns
 
 ---
 

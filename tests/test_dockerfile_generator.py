@@ -8,9 +8,9 @@ import sys
 src_path = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_path))
 
-from nlpi.services.docker import DockerfileGenerator
-from nlpi.services.repository import RepositoryScanner
-from nlpi.schemas.docker import DockerfileGenerationRequest
+from boatmcp.services.docker import DockerfileGenerator
+from boatmcp.services.repository import RepositoryScanner
+from boatmcp.schemas.docker import DockerfileGenerationRequest
 
 
 @pytest.mark.asyncio
