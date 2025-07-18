@@ -1,159 +1,128 @@
 # BoatMCP
 
-BoatMCP is an MCP (Model Context Protocol) server designed to help developers ship code from local development to production using natural language interactions with an LLM client.
+MCP server that helps developers ship code from local development to production using natural language interactions with Claude.
 
-## 🚀 Mission Statement
+## What It Does
 
-BoatMCP's mission is to eliminate the friction between "it works on my machine" and "it works in production" by providing intelligent tooling that guides developers through deployment workflows using plain English conversations with Claude or other MCP-compatible LLMs.
+BoatMCP analyzes your project, generates Dockerfiles, builds containers, and manages Kubernetes deployments through plain English conversations. It eliminates the friction between "it works on my machine" and "it works in production."
 
-## 🛠 Features
+**Key Features:**
+- Repository analysis and intelligent Dockerfile generation
+- Container building with optimization
+- Minikube cluster management
+- Natural language deployment workflows
+- Best practices for security and performance
 
-- **Repository Analysis**: Intelligent scanning of project structure, dependencies, and configuration
-- **Dockerfile Generation**: Automated creation of optimized Dockerfiles based on project analysis
-- **Container Building**: Docker image building with intelligent defaults and optimization
-- **Kubernetes Integration**: Minikube cluster management for local development
-- **Natural Language Interface**: Describe deployment goals in plain English
-- **Best Practices**: Incorporates security, performance, and deployment best practices
-
-## 🛠 How It Works
-
-BoatMCP acts as an MCP server that integrates with Claude Desktop and other MCP-compatible clients. When you describe your deployment needs in natural language, BoatMCP:
-
-1. **Analyzes** your project structure and dependencies
-2. **Generates** appropriate infrastructure code (Dockerfiles, configs)
-3. **Builds** container images with optimized settings
-4. **Provisions** local development environments (minikube)
-5. **Guides** you through deployment workflows step-by-step
-
-## 💡 Use Cases
-
-- **Rapid Deployment**: Go from local code to containerized application quickly
-- **Learning Tool**: Understand deployment concepts through guided interactions
-- **Development Environments**: Spin up consistent local Kubernetes environments
-- **CI/CD Preparation**: Generate deployment artifacts for production pipelines
-- **Standardization**: Ensure consistent deployment patterns across projects
-
-## 🎯 Target Users
-
-- **Developers** who want to ship code without deep DevOps expertise
-- **Teams** looking to standardize deployment practices
-- **Students** learning container and Kubernetes technologies
-- **Anyone** who prefers natural language over complex deployment commands
-
-## 🚀 Getting Started
+## Quick Start
 
 ### Prerequisites
+- Python 3.11+
+- [uv](https://github.com/astral-sh/uv) package manager
+- [Claude Desktop](https://claude.ai/download)
+- Docker (optional: minikube for Kubernetes)
 
-- **Python 3.11+**
-- **[uv](https://github.com/astral-sh/uv)** - Fast Python package manager
-- **[Claude Desktop](https://claude.ai/download)** - Required for MCP client interaction
-- **Docker** - For container building functionality
-- **minikube** - For Kubernetes cluster management (optional)
+### Installation
 
-### Installation & Setup
+```bash
+git clone <repository-url>
+cd boatmcp
+uv venv && source .venv/bin/activate
+uv add fastmcp httpx
+uv run boatmcp
+```
 
-1. **Clone and navigate to the project:**
-   ```bash
-   git clone <repository-url>
-   cd boatmcp
-   ```
+### Programmatic Usage
 
-2. **Set up Python environment with uv:**
-   ```bash
-   uv venv
-   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-   ```
+```python
+import boatmcp
 
-3. **Install dependencies:**
-   ```bash
-   uv add fastmcp httpx
-   ```
+# Run the MCP server
+boatmcp.run()
+```
 
-4. **Test the server:**
-   ```bash
-   uv run boatmcp
-   ```
+**Custom integration example:**
+```python
+#!/usr/bin/env python3
+import sys
+import boatmcp
 
-### Claude Desktop Configuration
+def main():
+    try:
+        boatmcp.run()
+    except KeyboardInterrupt:
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
-To use BoatMCP with Claude Desktop, you need to configure the MCP server in your Claude Desktop settings.
+if __name__ == "__main__":
+    main()
+```
 
-**Update your Claude Desktop config file:**
+**Package installation:**
+```bash
+pip install boatmcp
+python -c "import boatmcp; boatmcp.run()"
+```
 
-**Location:** `/Users/<username>/Library/Application Support/Claude/claude_desktop_config.json`
+### Claude Desktop Setup
 
-**Contents:**
+Edit your Claude Desktop config at `/Users/<username>/Library/Application Support/Claude/claude_desktop_config.json`:
+
 ```json
 {
   "mcpServers": {
     "boatmcp": {
       "command": "/Users/<username>/.local/bin/uv",
-      "args": [
-        "--directory",
-        "/full/path/to/your/boatmcp/directory",
-        "run",
-        "boatmcp"
-      ]
+      "args": ["--directory", "/full/path/to/boatmcp", "run", "boatmcp"]
     }
   }
 }
 ```
 
-**Important:** Replace `<username>` and `/path/to/your/boatmcp/directory` with actual values.
+## Usage
 
-### Usage
+Once configured, restart Claude Desktop and use natural language commands:
 
-Once configured, restart Claude Desktop and you'll have access to BoatMCP's deployment tools through natural language commands in your Claude conversations.
-
-**Example commands:**
 - "Analyze my Python project and generate a Dockerfile"
 - "Create a minikube cluster for local development"
 - "Build a Docker image from my current project"
-- "Help me deploy this Node.js app to production"
+- "Help me deploy this Node.js app"
 
-## 🔧 Integration
+## Use Cases
 
-As an MCP server, BoatMCP can be integrated with:
-- **Claude Desktop** for interactive deployment workflows
-- **IDEs and editors** with MCP support
-- **CI/CD pipelines** for automated deployment preparation
-- **Custom applications** via the MCP protocol
-- **Command-line tools** and scripts
+- **Rapid Deployment**: Local to containerized application quickly
+- **Learning**: Understand deployment concepts through guided interactions
+- **Development**: Consistent local Kubernetes environments
+- **CI/CD**: Generate deployment artifacts for production pipelines
+- **Standardization**: Consistent deployment patterns across projects
 
-## 🛠 Development
+## Target Users
 
-The project structure:
+- Developers who want to ship code without deep DevOps expertise
+- Teams standardizing deployment practices
+- Students learning container and Kubernetes technologies
+- Anyone preferring natural language over complex deployment commands
+
+## Development
+
 ```
 boatmcp/
-├── src/
-│   └── boatmcp/         # Main application package
-│       ├── main.py      # Core MCP server logic and entry point
-│       ├── services/    # Business logic services
-│       │   ├── repository.py   # Repository analysis
-│       │   └── docker.py      # Dockerfile generation
-│       └── schemas/     # Data schemas
-│           ├── repository.py   # Repository schemas
-│           └── docker.py      # Docker schemas
+├── src/boatmcp/
+│   ├── main.py          # MCP server entry point
+│   ├── services/        # Business logic
+│   └── schemas/         # Data schemas
 ├── tests/               # Test suite
-├── pyproject.toml       # Project configuration
-└── uv.lock             # Dependency lock file
+└── pyproject.toml       # Project config
 ```
 
-## 📝 Contributing
-
+**Contributing:**
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes following TDD principles
+3. Follow TDD principles
 4. Test with `uv run boatmcp`
 5. Submit a pull request
 
-### Development Guidelines
-
-- Follow Test-Driven Development (TDD)
-- All code must have type hints
-- Use pytest for testing
-- Follow the existing code structure and patterns
-
 ---
 
-*Built with the Model Context Protocol for seamless integration with AI-powered development workflows.*
+*Built with the Model Context Protocol for seamless AI-powered development workflows.*
