@@ -44,7 +44,7 @@ BoatMCP acts as an MCP server that integrates with Claude Desktop and other MCP-
 
 ### Prerequisites
 
-- **Python 3.11+** (project uses 3.12+ as recommended)
+- **Python 3.11+**
 - **[uv](https://github.com/astral-sh/uv)** - Fast Python package manager
 - **[Claude Desktop](https://claude.ai/download)** - Required for MCP client interaction
 - **Docker** - For container building functionality
@@ -71,7 +71,7 @@ BoatMCP acts as an MCP server that integrates with Claude Desktop and other MCP-
 
 4. **Test the server:**
    ```bash
-   uv run main.py
+   uv run boatmcp
    ```
 
 ### Claude Desktop Configuration
@@ -92,7 +92,7 @@ To use BoatMCP with Claude Desktop, you need to configure the MCP server in your
         "--directory",
         "/full/path/to/your/boatmcp/directory",
         "run",
-        "main.py"
+        "boatmcp"
       ]
     }
   }
@@ -125,10 +125,9 @@ As an MCP server, BoatMCP can be integrated with:
 The project structure:
 ```
 boatmcp/
-├── main.py              # MCP server entrypoint
 ├── src/
 │   └── boatmcp/         # Main application package
-│       ├── main.py      # Core MCP server logic
+│       ├── main.py      # Core MCP server logic and entry point
 │       ├── services/    # Business logic services
 │       │   ├── repository.py   # Repository analysis
 │       │   └── docker.py      # Dockerfile generation
@@ -145,7 +144,7 @@ boatmcp/
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes following TDD principles
-4. Test with `uv run main.py`
+4. Test with `uv run boatmcp`
 5. Submit a pull request
 
 ### Development Guidelines

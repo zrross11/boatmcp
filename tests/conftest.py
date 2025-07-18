@@ -1,9 +1,9 @@
 """Pytest configuration and fixtures."""
 
-import pytest
-from pathlib import Path
 import tempfile
-import shutil
+from pathlib import Path
+
+import pytest
 
 
 @pytest.fixture
@@ -18,7 +18,7 @@ def python_project_dir(temp_project_dir):
     """Create a sample Python project for testing."""
     project_dir = temp_project_dir / "python_project"
     project_dir.mkdir()
-    
+
     # Create app.py
     (project_dir / "app.py").write_text("""
 from flask import Flask
@@ -32,10 +32,10 @@ def hello():
 if __name__ == '__main__':
     app.run()
 """)
-    
+
     # Create requirements.txt
     (project_dir / "requirements.txt").write_text("flask==2.3.2\n")
-    
+
     return project_dir
 
 
@@ -44,7 +44,7 @@ def go_project_dir(temp_project_dir):
     """Create a sample Go project for testing."""
     project_dir = temp_project_dir / "go_project"
     project_dir.mkdir()
-    
+
     # Create main.go
     (project_dir / "main.go").write_text("""
 package main
@@ -63,12 +63,12 @@ func main() {
     http.ListenAndServe(":8080", nil)
 }
 """)
-    
+
     # Create go.mod
     (project_dir / "go.mod").write_text("""
 module testproject
 
 go 1.21
 """)
-    
+
     return project_dir

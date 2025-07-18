@@ -118,3 +118,7 @@ Thumbs.db
 
 # uv
 .uv/
+
+# Examples directory
+examples/**/Dockerfile*
+examples/**/helm/

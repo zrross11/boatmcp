@@ -1,6 +1,6 @@
 """Repository services."""
 
+from .analyzer import RepositoryAnalyzer
 from .scanner import RepositoryScanner
-from .analyzer import ProjectAnalyzer
 
-__all__ = ["RepositoryScanner", "ProjectAnalyzer"]
+__all__ = ["RepositoryScanner", "RepositoryAnalyzer"]
