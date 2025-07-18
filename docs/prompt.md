@@ -10,6 +10,20 @@ I want to test the BoatMCP server. Can you help me create a minikube cluster cal
 After that, can you show me what clusters are available and then delete the test cluster when we're done?
 ```
 
+## Dockerfile Generation Test
+
+```
+I have a Go web application in the examples/go_web_app directory that I'd like to containerize. Can you help me create a Dockerfile for it?
+
+The application structure is:
+- main.go is the entry point
+- It's a simple Go web server
+- I want to follow Docker best practices for Go applications
+- Should be optimized for production deployment
+
+Please create a Dockerfile that builds and runs this Go web application properly.
+```
+
 ## Expected Behavior
 
 Claude Desktop should be able to:
@@ -41,3 +55,4 @@ Once basic functionality is working, try these advanced scenarios:
 - **Resource allocation**: Test different CPU and memory configurations
 - **Error handling**: Try to create a cluster with invalid parameters
 - **Deployment workflows**: Test the complete "local development to production" flow
+- **Dockerfile generation**: Test creating a Dockerfile for containerizing the application
