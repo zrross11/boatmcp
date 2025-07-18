@@ -9,14 +9,18 @@ dependencies = [
     "fastmcp @ git+https://github.com/jlowin/fastmcp",
 ]
 
+[project.scripts]
+boatmcp = "boatmcp.main:main"
+
 [project.optional-dependencies]
 test = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-mock>=3.10.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-mock>=3.14.1",
+    "pytest-cov>=4.0.0",
 ]
 dev = [
-    "mypy>=1.0.0",
+    "mypy>=1.17.0",
     "ruff>=0.1.0",
     "black>=23.0.0",
 ]
@@ -52,6 +56,8 @@ mypy_path = "src"
 [tool.ruff]
 target-version = "py311"
 line-length = 88
+
+[tool.ruff.lint]
 select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
@@ -67,9 +73,10 @@ ignore = [
     "C901",  # too complex
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]  # allow assert statements in tests
 
 [tool.black]
 target-version = ["py311"]
 line-length = 88
+

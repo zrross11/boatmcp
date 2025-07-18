@@ -13,7 +13,7 @@ The core purpose of BoatMCP is to allow developers to describe their deployment 
 ## Development Setup
 
 **Prerequisites:**
-- Python 3.11+ (project uses 3.12+ as recommended)
+- Python 3.11+
 - [uv](https://github.com/astral-sh/uv) - Fast Python package manager
 - minikube (for Kubernetes cluster management functionality)
 

@@ -1,8 +1,8 @@
 """Repository scanning and analysis schemas."""
 
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Literal
 from pathlib import Path
+from typing import Literal
 
 
 @dataclass(frozen=True)
@@ -10,7 +10,7 @@ class FileInfo:
     """Information about a scanned file."""
     path: Path
     size: int
-    content: Optional[str] = None
+    content: str | None = None
     is_binary: bool = False
 
 
@@ -20,15 +20,15 @@ class ProjectAnalysis:
     root_path: Path
     project_type: Literal["python", "go", "node", "java", "rust", "unknown"]
     language: str
-    framework: Optional[str] = None
-    package_manager: Optional[str] = None
-    dependencies: List[str] = None
-    entry_points: List[str] = None
-    config_files: List[FileInfo] = None
-    source_files: List[FileInfo] = None
-    static_files: List[FileInfo] = None
-    
-    def __post_init__(self):
+    framework: str | None = None
+    package_manager: str | None = None
+    dependencies: list[str] | None = None
+    entry_points: list[str] | None = None
+    config_files: list[FileInfo] | None = None
+    source_files: list[FileInfo] | None = None
+    static_files: list[FileInfo] | None = None
+
+    def __post_init__(self) -> None:
         if self.dependencies is None:
             object.__setattr__(self, 'dependencies', [])
         if self.entry_points is None:
@@ -45,6 +45,6 @@ class ProjectAnalysis:
 class ScanResult:
     """Result of repository scanning operation."""
     success: bool
-    analysis: Optional[ProjectAnalysis] = None
-    error: Optional[str] = None
+    analysis: ProjectAnalysis | None = None
+    error: str | None = None
     files_scanned: int = 0
