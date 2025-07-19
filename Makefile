@@ -34,16 +34,13 @@ typecheck:
 
 # Testing targets
 test:
-	uv run pytest
-
-test-internal:
 	BOATMCP_INTERNAL_TOOLS=true uv run pytest
 
 test-cov:
-	uv run pytest --cov=src/boatmcp --cov-report=term-missing --cov-report=xml
+	BOATMCP_INTERNAL_TOOLS=true uv run pytest --cov=src --cov-report=xml --cov-report=term-missing
 
 # Combined check target
-check: lint typecheck test
+check: lint typecheck test-cov
 
 # Cleanup target
 clean:
