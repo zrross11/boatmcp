@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.2.0](https://github.com/zrross11/boatmcp/compare/v0.1.1...v0.2.0) (2025-07-19)
+
+
+### Features
+
+* add a loader for pushing local images to minikube ([#8](https://github.com/zrross11/boatmcp/issues/8)) ([0afbab8](https://github.com/zrross11/boatmcp/commit/0afbab8e9fbeff1a03b33aaaabe12d76c09d2532))
+* created config module, docs: updated to latest ([#13](https://github.com/zrross11/boatmcp/issues/13)) ([6c3c8d3](https://github.com/zrross11/boatmcp/commit/6c3c8d3196423706243b909c8454558dc04ec6bf))
+* test ([#17](https://github.com/zrross11/boatmcp/issues/17)) ([d6b595f](https://github.com/zrross11/boatmcp/commit/d6b595f67a9e6f1a01018d05abcc588a4d34adbb))
+
+
+### Bug Fixes
+
+* re-run workflow for release please ([#15](https://github.com/zrross11/boatmcp/issues/15)) ([7704623](https://github.com/zrross11/boatmcp/commit/77046238cdb9b444a928ca27019191911c38b558))
+* remove main Dockerfile ([#11](https://github.com/zrross11/boatmcp/issues/11)) ([9508b42](https://github.com/zrross11/boatmcp/commit/9508b423e669e49355171cf94d4eb092acd7d5f8))
+
+
+### Documentation
+
+* updating to reflect current organization ([#10](https://github.com/zrross11/boatmcp/issues/10)) ([0c3069d](https://github.com/zrross11/boatmcp/commit/0c3069d08aae16d0f56b528d836c2d3061c5baf7))
+
 ## [0.1.1](https://github.com/zrross11/boatmcp/compare/v0.1.0...v0.1.1) (2025-07-19)
 
 
