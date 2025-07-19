@@ -1,10 +1,12 @@
 """Kubernetes-related MCP tools (Helm and Minikube)."""
 
-import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastmcp import FastMCP
+
+if TYPE_CHECKING:
+    pass
 
 from .generator import deploy_helm_chart, generate_helm_chart, uninstall_helm_chart
 from .minikube import (
@@ -14,13 +16,11 @@ from .minikube import (
 )
 
 
-def register_kubernetes_tools(mcp: FastMCP[Any]) -> None:
+def register_kubernetes_tools(mcp: FastMCP[Any], config: Any) -> None:
     """Register all Kubernetes-related MCP tools."""
 
-    # Check if internal tools should be enabled
-    enable_internal_tools = (
-        os.getenv("BOATMCP_INTERNAL_TOOLS", "false").lower() == "true"
-    )
+    # Use config instead of environment variable
+    enable_internal_tools = config.internal_tools
 
     # Primary cluster management tool (always visible)
     @mcp.tool()

@@ -1,0 +1,25 @@
+# BoatMCP Test Configuration File
+# This configuration is used during testing to enable internal tools
+
+# Server configuration
+server:
+  # Enable internal development tools for testing
+  internal_tools: true
+  
+  # MCP server settings
+  transport: "stdio"
+  
+# Tool configurations
+tools:
+  # Docker tool settings
+  docker:
+    enabled: true
+    
+  # Kubernetes tool settings  
+  kubernetes:
+    enabled: true
+    default_minikube_profile: "boatmcp-cluster"
+    
+  # Workflow tool settings
+  workflows:
+    enabled: true 

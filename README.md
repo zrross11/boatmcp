@@ -1,6 +1,6 @@
 # BoatMCP
 
-MCP server that helps developers ship code from local development to production using natural language interactions with Claude.
+MCP server that helps developers ship code from local development to production using natural language interactions with Claude or Cursor.
 
 ## What It Does
 
@@ -19,7 +19,7 @@ BoatMCP analyzes your project, generates Dockerfiles, builds containers, and man
 ### Prerequisites
 - Python 3.11+
 - [uv](https://github.com/astral-sh/uv) package manager  
-- [Claude Desktop](https://claude.ai/download)
+- [Claude Desktop](https://claude.ai/download) or [Cursor IDE](https://cursor.sh)
 
 See [Getting Started Guide](docs/getting_started.md) for detailed installation instructions for Docker, minikube, Helm, and other dependencies.
 
@@ -32,11 +32,35 @@ uv venv && source .venv/bin/activate
 uv sync
 ```
 
+### Configuration
+
+BoatMCP uses a `config.yaml` file for configuration. Create one in your project root:
+
+```yaml
+# BoatMCP Configuration
+server:
+  # Enable internal development tools (for testing and development)
+  internal_tools: false
+  transport: "stdio"
+
+tools:
+  docker:
+    enabled: true
+  kubernetes:
+    enabled: true
+    default_minikube_profile: "boatmcp-cluster"
+  workflows:
+    enabled: true
+```
+
 ### Running the Server
 
 ```bash
-# Run as MCP server for Claude Desktop
+# Run with default config.yaml
 uv run boatmcp
+
+# Run with custom config file
+uv run boatmcp my-custom-config.yaml
 ```
 
 ### Programmatic Usage
@@ -48,7 +72,9 @@ import boatmcp
 boatmcp.run()
 ```
 
-### Claude Desktop Setup
+## MCP Client Setup
+
+### Claude Desktop
 
 Edit your Claude Desktop config at `/Users/<username>/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -63,11 +89,28 @@ Edit your Claude Desktop config at `/Users/<username>/Library/Application Suppor
 }
 ```
 
+### Cursor IDE
+
+1. Open Cursor IDE
+2. Go to Settings → Features → Enable Model Context Protocol (MCP)
+3. Add BoatMCP server configuration:
+
+```json
+{
+  "mcpServers": {
+    "boatmcp": {
+      "command": "uv",
+      "args": ["--directory", "/full/path/to/boatmcp", "run", "boatmcp"]
+    }
+  }
+}
+```
+
 **Important:** Replace `<username>` and `/full/path/to/boatmcp` with your actual paths.
 
 ## Usage
 
-Once configured, restart Claude Desktop and use natural language commands:
+Once configured, restart your MCP client and use natural language commands:
 
 - "Analyze my Python project and generate a Dockerfile"
 - "Create a minikube cluster for local development"
@@ -78,60 +121,71 @@ Once configured, restart Claude Desktop and use natural language commands:
 
 ## Available MCP Tools
 
-BoatMCP provides the following tools through the Model Context Protocol:
+### Core Workflow
+- **`minikube_deployment_workflow`** - Complete project-to-production deployment
 
-### Docker Tools
-- **Build Docker images** - Analyze projects and create optimized Docker images
-- **Manage containers** - Start, stop, and inspect Docker containers
+### Cluster Management  
+- **`manage_minikube_cluster`** - Create, start, stop, and delete minikube clusters
 
-### Minikube Tools  
-- **Create clusters** - Set up local Kubernetes clusters with custom configurations
-- **Delete clusters** - Clean up test clusters with optional data purging
-- **Load images** - Load locally built Docker images into minikube clusters
+### Internal Tools (Development Mode)
+When `internal_tools: true` is set in your config.yaml:
+- **`analyze_project`** - Detailed project analysis and recommendations
+- **`generate_dockerfile`** - Create optimized Dockerfiles
+- **`build_docker_image`** - Build and tag Docker images
+- **`load_image_to_minikube`** - Load images into minikube registry
+- **`generate_helm_chart`** - Create Kubernetes Helm charts
+- **`deploy_helm_chart`** - Deploy applications using Helm
 
-### Helm Tools
-- **Generate charts** - Create Helm charts from project analysis
-- **Deploy applications** - Deploy Helm charts to Kubernetes clusters
-- **Manage releases** - Install, upgrade, and uninstall Helm releases
+## Configuration Options
 
-## Use Cases
+The `config.yaml` file supports these settings:
 
-- **Rapid Deployment**: Local to containerized application quickly
-- **Learning**: Understand deployment concepts through guided interactions
-- **Development**: Consistent local Kubernetes environments
-- **CI/CD**: Generate deployment artifacts for production pipelines
-- **Standardization**: Consistent deployment patterns across projects
+```yaml
+server:
+  internal_tools: false    # Enable development/debugging tools
+  transport: "stdio"       # MCP transport type
 
-## Target Users
+tools:
+  docker:
+    enabled: true          # Enable Docker tools
+  kubernetes:
+    enabled: true          # Enable Kubernetes tools
+    default_minikube_profile: "boatmcp-cluster"
+  workflows:
+    enabled: true          # Enable workflow orchestration
+```
 
-- Developers who want to ship code without deep DevOps expertise
-- Teams standardizing deployment practices
-- Students learning container and Kubernetes technologies
-- Anyone preferring natural language over complex deployment commands
+## Development
+
+```bash
+# Install development dependencies
+uv sync --extra dev --extra test
+
+# Run tests
+make test
+
+# Run all checks (lint + typecheck + test)
+make check
+
+# Run with internal tools enabled
+cp config.test.yaml config.yaml  # Enables internal_tools
+uv run boatmcp
+```
+
+## Architecture
+
+BoatMCP follows a modular MCP server architecture:
+
+- **Core**: Configuration management and server setup
+- **Docker**: Container operations and Dockerfile generation  
+- **Kubernetes**: Cluster management and Helm operations
+- **Workflows**: High-level deployment orchestration
+
+All operations are exposed as MCP tools and can be invoked through natural language interactions with compatible clients.
 
 ## Contributing
 
-We welcome contributions! Here's how to get started:
-
-1. **Clone the repository** (no fork needed for contributions)
-2. **Create a feature branch** from main
-3. **Follow TDD principles** - write tests first, then implementation
-4. **Test your changes** with `uv run pytest`
-5. **Verify the MCP server** runs with `uv run src/boatmcp/main.py`
-6. **Submit a pull request** to the main repository
-
-**Development Guidelines:**
-- Follow the TDD workflow outlined in [CLAUDE.md](CLAUDE.md)
-- Ensure all tests pass before submitting PRs
-- Use type hints and follow the project's coding standards
-- Add documentation for new features
-
-## Documentation
-
-- [Getting Started Guide](docs/getting_started.md) - Complete setup instructions
-- [Development Guidelines](CLAUDE.md) - TDD workflow and coding standards
-- [Test Prompt](docs/prompt.md) - How to test MCP functionality
-- [TODO List](docs/todo.md) - Planned features and improvements
+See [CLAUDE.md](CLAUDE.md) for development guidelines and architecture details.
 
 ---
 
