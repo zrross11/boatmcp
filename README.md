@@ -8,8 +8,9 @@ BoatMCP analyzes your project, generates Dockerfiles, builds containers, and man
 
 **Key Features:**
 - Repository analysis and intelligent Dockerfile generation
-- Container building with optimization
-- Minikube cluster management
+- Docker image building and container management
+- Minikube cluster management and image loading
+- Helm chart generation and deployment
 - Natural language deployment workflows
 - Best practices for security and performance
 
@@ -17,9 +18,10 @@ BoatMCP analyzes your project, generates Dockerfiles, builds containers, and man
 
 ### Prerequisites
 - Python 3.11+
-- [uv](https://github.com/astral-sh/uv) package manager
+- [uv](https://github.com/astral-sh/uv) package manager  
 - [Claude Desktop](https://claude.ai/download)
-- Docker (optional: minikube for Kubernetes)
+
+See [Getting Started Guide](docs/getting_started.md) for detailed installation instructions for Docker, minikube, Helm, and other dependencies.
 
 ### Installation
 
@@ -27,7 +29,13 @@ BoatMCP analyzes your project, generates Dockerfiles, builds containers, and man
 git clone <repository-url>
 cd boatmcp
 uv venv && source .venv/bin/activate
-uv add fastmcp httpx
+uv sync
+```
+
+### Running the Server
+
+```bash
+# Run as MCP server for Claude Desktop
 uv run boatmcp
 ```
 
@@ -36,33 +44,8 @@ uv run boatmcp
 ```python
 import boatmcp
 
-# Run the MCP server
+# Run the MCP server programmatically
 boatmcp.run()
-```
-
-**Custom integration example:**
-```python
-#!/usr/bin/env python3
-import sys
-import boatmcp
-
-def main():
-    try:
-        boatmcp.run()
-    except KeyboardInterrupt:
-        sys.exit(0)
-    except Exception as e:
-        print(f"Error: {e}")
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
-```
-
-**Package installation:**
-```bash
-pip install boatmcp
-python -c "import boatmcp; boatmcp.run()"
 ```
 
 ### Claude Desktop Setup
@@ -80,6 +63,8 @@ Edit your Claude Desktop config at `/Users/<username>/Library/Application Suppor
 }
 ```
 
+**Important:** Replace `<username>` and `/full/path/to/boatmcp` with your actual paths.
+
 ## Usage
 
 Once configured, restart Claude Desktop and use natural language commands:
@@ -87,7 +72,27 @@ Once configured, restart Claude Desktop and use natural language commands:
 - "Analyze my Python project and generate a Dockerfile"
 - "Create a minikube cluster for local development"
 - "Build a Docker image from my current project"
+- "Load my Docker image into the minikube cluster"
+- "Generate Helm charts for my application"
 - "Help me deploy this Node.js app"
+
+## Available MCP Tools
+
+BoatMCP provides the following tools through the Model Context Protocol:
+
+### Docker Tools
+- **Build Docker images** - Analyze projects and create optimized Docker images
+- **Manage containers** - Start, stop, and inspect Docker containers
+
+### Minikube Tools  
+- **Create clusters** - Set up local Kubernetes clusters with custom configurations
+- **Delete clusters** - Clean up test clusters with optional data purging
+- **Load images** - Load locally built Docker images into minikube clusters
+
+### Helm Tools
+- **Generate charts** - Create Helm charts from project analysis
+- **Deploy applications** - Deploy Helm charts to Kubernetes clusters
+- **Manage releases** - Install, upgrade, and uninstall Helm releases
 
 ## Use Cases
 
@@ -104,24 +109,29 @@ Once configured, restart Claude Desktop and use natural language commands:
 - Students learning container and Kubernetes technologies
 - Anyone preferring natural language over complex deployment commands
 
-## Development
+## Contributing
 
-```
-boatmcp/
-├── src/boatmcp/
-│   ├── main.py          # MCP server entry point
-│   ├── services/        # Business logic
-│   └── schemas/         # Data schemas
-├── tests/               # Test suite
-└── pyproject.toml       # Project config
-```
+We welcome contributions! Here's how to get started:
 
-**Contributing:**
-1. Fork the repository
-2. Create a feature branch
-3. Follow TDD principles
-4. Test with `uv run boatmcp`
-5. Submit a pull request
+1. **Clone the repository** (no fork needed for contributions)
+2. **Create a feature branch** from main
+3. **Follow TDD principles** - write tests first, then implementation
+4. **Test your changes** with `uv run pytest`
+5. **Verify the MCP server** runs with `uv run src/boatmcp/main.py`
+6. **Submit a pull request** to the main repository
+
+**Development Guidelines:**
+- Follow the TDD workflow outlined in [CLAUDE.md](CLAUDE.md)
+- Ensure all tests pass before submitting PRs
+- Use type hints and follow the project's coding standards
+- Add documentation for new features
+
+## Documentation
+
+- [Getting Started Guide](docs/getting_started.md) - Complete setup instructions
+- [Development Guidelines](CLAUDE.md) - TDD workflow and coding standards
+- [Test Prompt](docs/prompt.md) - How to test MCP functionality
+- [TODO List](docs/todo.md) - Planned features and improvements
 
 ---
 

@@ -18,28 +18,15 @@
   - Learn from failures to improve subsequent generation attempts
 
 ### Container Image Management
-- [ ] **Image Loading Function**: Create a new function to load Docker images into minikube
-  - Should support loading from local Docker daemon into minikube
-  - Later generalize to support uploading to container registries (DockerHub, ECR, GCR, etc.)
-  - Include error handling for image loading failures
-
-### Minikube Profile Management
-- [ ] **Profile Switching**: Ensure that when creating a minikube cluster, the profile is switched to the correct profile
-  - Automatically switch context to the newly created cluster
-  - Verify the profile is active after creation
-  - Handle cases where profile switching fails
+- [ ] **Registry Upload**: Generalize image loading to support uploading to container registries (DockerHub, ECR, GCR, etc.)
 
 ## Medium Priority Features
 
 ### Deployment Workflows
-- [ ] **Kubernetes Deployment**: Add functions to deploy applications to minikube clusters
-- [ ] **Helm Chart Generation**: Generate Helm charts for applications
-- [ ] **Service Management**: Create, update, and delete Kubernetes services
 - [ ] **Ingress Configuration**: Set up ingress controllers and rules
 
 ### CI/CD Integration
 - [ ] **GitHub Actions Templates**: Generate CI/CD pipeline templates
-- [ ] **Multi-stage Builds**: Optimize Docker builds with multi-stage patterns
 - [ ] **Build Caching**: Implement Docker layer caching strategies
 
 ## Low Priority Features
