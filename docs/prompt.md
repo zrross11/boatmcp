@@ -30,6 +30,33 @@ I have a project that I want to deploy using BoatMCP. Can you help me:
 Walk me through this entire workflow.
 ```
 
+## One-Stop Deployment Workflow (NEW!)
+
+The fastest way to get from project to production is using the new **minikube_deployment_workflow** tool:
+
+```
+I want to deploy my application to minikube using the fastest possible workflow. Please use the one-stop deployment workflow to take my project from code to running application in minikube.
+
+My project is located at: /path/to/my/project
+App name: my-awesome-app
+```
+
+### Advanced Workflow Options
+
+For more control over the deployment process:
+
+```
+Use the minikube deployment workflow with these settings:
+- Project path: /path/to/my/project  
+- App name: production-app
+- Namespace: production
+- Image tag: v1.2.3
+- Port: 8080
+- Optimize for size: true
+- Use multi-stage builds: true
+- Custom instructions: ["Add health check endpoint", "Enable SSL"]
+```
+
 ## Expected MCP Tools Usage
 
 Claude Desktop should be able to use these BoatMCP tools:
@@ -41,11 +68,23 @@ Claude Desktop should be able to use these BoatMCP tools:
 
 ### Docker Operations
 - **build_docker_image** - Build container images from projects
+- **generate_dockerfile** - Generate and save Dockerfiles for projects
+- **analyze_project_for_dockerfile** - Get project analysis data for Dockerfile generation
+- **get_dockerfile_template_info** - Inspect Dockerfile template selection and parameters
+- **preview_dockerfile** - Preview generated Dockerfile content without saving
+- **get_dockerfile_templates** - View available Dockerfile templates and generation logic
 
 ### Helm Operations  
-- **generate_helm_chart** - Create Helm charts from project analysis
-- **deploy_helm_chart** - Deploy applications to Kubernetes
-- **uninstall_helm_chart** - Remove deployed applications
+- **create_helm_chart** - Create Helm charts from project analysis
+- **install_helm_chart** - Deploy applications to Kubernetes
+- **remove_helm_chart** - Remove deployed applications
+- **get_helm_template_info** - Inspect Helm chart template parameters and structure
+- **preview_helm_chart** - Preview generated Helm chart content without saving
+- **get_helm_templates** - View available Helm templates and raw template sources
+
+### Workflow Orchestration (NEW!)
+- **minikube_deployment_workflow** - Complete end-to-end deployment from project to running application
+- **get_workflow_progress** - Monitor progress of the deployment workflow
 
 ## Verification Steps
 
@@ -126,4 +165,43 @@ Create a minikube cluster with invalid parameters (like 100 CPUs) and see how Bo
 ### Full CI/CD Simulation
 ```
 Simulate a complete development workflow: analyze my project, build it, test it locally in minikube, generate production-ready Helm charts, and clean up when done.
+```
+
+### Workflow Testing
+```
+Test the new one-stop deployment workflow with a Python Flask application. Monitor the progress as it goes through each step: Dockerfile generation, image building, minikube loading, Helm chart creation, and deployment.
+```
+
+### Workflow Error Handling
+```
+Test what happens when the workflow encounters errors at different stages. For example, try deploying a project without a requirements.txt file, or with invalid Dockerfile configurations.
+```
+
+### Template Inspection and Verification (NEW!)
+```
+Before generating any files, inspect what BoatMCP will create:
+
+1. First, analyze the project structure:
+   "Analyze my project and show me what type of Dockerfile template will be selected"
+
+2. Preview the Dockerfile that would be generated:
+   "Show me a preview of the Dockerfile that would be generated for my Python project with size optimization enabled"
+
+3. Inspect the Helm chart templates:
+   "Show me what Helm chart files will be created and preview their content for my application called 'my-app'"
+
+4. View the raw template sources:
+   "Show me the actual template files used for Dockerfile generation so I can understand how they work"
+```
+
+### Template Verification Workflow
+```
+Use the inspection tools to verify templates before generation:
+
+1. "Get template info for my Dockerfile with these settings: port 8080, optimize for size, multi-stage build"
+2. "Preview the Dockerfile with those settings" 
+3. "If it looks good, generate and save the Dockerfile"
+4. "Get Helm template info for chart name 'my-app'"
+5. "Preview the Helm chart content"
+6. "If correct, create the Helm chart"
 ```

@@ -1,4 +1,4 @@
-.PHONY: help lint typecheck test test-cov format check clean install install-dev
+.PHONY: help lint typecheck test test-cov format check clean install install-dev test-internal
 
 # Default target
 help:
@@ -10,6 +10,7 @@ help:
 	@echo "  format       Run ruff formatter"
 	@echo "  typecheck    Run mypy type checker"
 	@echo "  test         Run pytest tests"
+	@echo "  test-internal Run pytest tests with internal tools enabled"
 	@echo "  test-cov     Run tests with coverage report"
 	@echo "  check        Run all checks (lint + typecheck + test)"
 	@echo "  clean        Clean cache and temporary files"
@@ -34,6 +35,9 @@ typecheck:
 # Testing targets
 test:
 	uv run pytest
+
+test-internal:
+	BOATMCP_INTERNAL_TOOLS=true uv run pytest
 
 test-cov:
 	uv run pytest --cov=src/boatmcp --cov-report=term-missing --cov-report=xml
