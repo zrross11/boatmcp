@@ -188,5 +188,4 @@ All operations are exposed as MCP tools and can be invoked through natural langu
 See [CLAUDE.md](CLAUDE.md) for development guidelines and architecture details.
 
 ---
-
 *Built with the Model Context Protocol for seamless AI-powered development workflows.*
