@@ -4,7 +4,13 @@ import re
 import subprocess
 from pathlib import Path
 
+from jinja2 import Environment, FileSystemLoader
+
 from ..core.analysis import ProjectAnalysis
+
+# Set up Jinja2 environment
+template_dir = Path(__file__).parent.parent / "templates" / "dockerfile"
+env = Environment(loader=FileSystemLoader(template_dir))
 
 
 def generate_dockerfile_content(
@@ -28,132 +34,52 @@ def generate_dockerfile_content(
         Complete Dockerfile content as a string
     """
     project_type = analysis.project_type
+    template_name = f"{project_type}.dockerfile.j2"
 
-    if project_type == "python":
-        return _generate_python_dockerfile(
-            analysis, port, optimize_for_size, multi_stage
-        )
-    elif project_type == "node.js":
-        return _generate_nodejs_dockerfile(
-            analysis, port, optimize_for_size, multi_stage
-        )
-    elif project_type == "go":
-        return _generate_go_dockerfile(analysis, port, optimize_for_size, multi_stage)
-    elif project_type == "rust":
-        return _generate_rust_dockerfile(analysis, port, optimize_for_size, multi_stage)
-    elif project_type == "java":
-        return _generate_java_dockerfile(analysis, port, optimize_for_size, multi_stage)
-    else:
-        return _generate_generic_dockerfile(analysis, port)
+    # Fallback to generic template if specific one doesn't exist
+    if not (template_dir / template_name).exists():
+        template_name = "generic.dockerfile.j2"
 
+    template = env.get_template(template_name)
 
-def _generate_python_dockerfile(
-    analysis: ProjectAnalysis, port: int, optimize_for_size: bool, multi_stage: bool
-) -> str:
-    """Generate Python Dockerfile."""
-    base_image = "python:3.11-slim" if optimize_for_size else "python:3.11"
+    # Base image selection
+    base_images = {
+        "python": "python:3.11-slim" if optimize_for_size else "python:3.11",
+        "node.js": "node:18-alpine" if optimize_for_size else "node:18",
+        "go": f"golang:{_detect_go_version()}{'-alpine' if optimize_for_size else ''}",
+        "rust": "rust:1.70-slim" if optimize_for_size else "rust:1.70",
+        "java": "openjdk:11-jre-slim" if optimize_for_size else "openjdk:11",
+        "generic": "alpine:latest",
+    }
+    base_image = base_images.get(project_type, "alpine:latest")
 
-    # Detect main application file
-    main_file = "app.py"
-    if "main.py" in analysis.project_files:
-        main_file = "main.py"
-    elif "server.py" in analysis.project_files:
-        main_file = "server.py"
+    # Main file detection
+    main_file_map = {
+        "python": "main.py"
+        if "main.py" in analysis.project_files
+        else "server.py"
+        if "server.py" in analysis.project_files
+        else "app.py",
+        "node.js": "server.js"
+        if "server.js" in analysis.project_files
+        else "app.js"
+        if "app.js" in analysis.project_files
+        else "index.js",
+    }
+    main_file = main_file_map.get(project_type, "app")
 
-    content = f"""FROM {base_image}
+    context = {
+        "analysis": analysis,
+        "port": port,
+        "optimize_for_size": optimize_for_size,
+        "multi_stage": multi_stage,
+        "custom_instructions": custom_instructions,
+        "base_image": base_image,
+        "main_file": main_file,
+        "go_version": _detect_go_version() if project_type == "go" else None,
+    }
 
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE {port}
-
-CMD ["python", "{main_file}"]
-"""
-    return content
-
-
-def _generate_nodejs_dockerfile(
-    analysis: ProjectAnalysis, port: int, optimize_for_size: bool, multi_stage: bool
-) -> str:
-    """Generate Node.js Dockerfile."""
-    base_image = "node:18-alpine" if optimize_for_size else "node:18"
-
-    # Detect main application file
-    main_file = "index.js"
-    if "server.js" in analysis.project_files:
-        main_file = "server.js"
-    elif "app.js" in analysis.project_files:
-        main_file = "app.js"
-
-    content = f"""FROM {base_image}
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-
-EXPOSE {port}
-
-CMD ["node", "{main_file}"]
-"""
-    return content
-
-
-def _generate_go_dockerfile(
-    analysis: ProjectAnalysis, port: int, optimize_for_size: bool, multi_stage: bool
-) -> str:
-    """Generate Go Dockerfile."""
-    # Detect user's Go version
-    go_version = _detect_go_version()
-
-    if multi_stage:
-        builder_image = f"golang:{go_version}-alpine"
-        content = f"""FROM {builder_image} AS builder
-
-WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY . .
-RUN CGO_ENABLED=0 GOOS=linux go build -o main .
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-
-COPY --from=builder /app/main .
-
-EXPOSE {port}
-
-CMD ["./main"]
-"""
-    else:
-        base_image = (
-            f"golang:{go_version}-alpine"
-            if optimize_for_size
-            else f"golang:{go_version}"
-        )
-        content = f"""FROM {base_image}
-
-WORKDIR /app
-
-COPY go.mod go.sum ./
-RUN go mod download
-
-COPY . .
-RUN go build -o main .
-
-EXPOSE {port}
-
-CMD ["./main"]
-"""
-    return content
+    return template.render(context)
 
 
 def _detect_go_version() -> str:
@@ -187,123 +113,6 @@ def _detect_go_version() -> str:
     ):
         # If go command fails or doesn't exist, use default version
         return "1.21"
-
-
-def _generate_rust_dockerfile(
-    analysis: ProjectAnalysis, port: int, optimize_for_size: bool, multi_stage: bool
-) -> str:
-    """Generate Rust Dockerfile."""
-    if multi_stage:
-        content = f"""FROM rust:1.70 AS builder
-
-WORKDIR /app
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
-
-COPY . .
-RUN cargo build --release
-
-FROM debian:bullseye-slim
-RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
-
-COPY --from=builder /app/target/release/* ./
-
-EXPOSE {port}
-
-CMD ["./main"]
-"""
-    else:
-        base_image = "rust:1.70-slim" if optimize_for_size else "rust:1.70"
-        content = f"""FROM {base_image}
-
-WORKDIR /app
-
-COPY Cargo.toml Cargo.lock ./
-RUN cargo fetch
-
-COPY . .
-RUN cargo build --release
-
-EXPOSE {port}
-
-CMD ["./target/release/main"]
-"""
-    return content
-
-
-def _generate_java_dockerfile(
-    analysis: ProjectAnalysis, port: int, optimize_for_size: bool, multi_stage: bool
-) -> str:
-    """Generate Java Dockerfile."""
-    base_image = "openjdk:11-jre-slim" if optimize_for_size else "openjdk:11"
-
-    if analysis.dependency_files.get("pom.xml"):
-        # Maven project
-        if multi_stage:
-            content = f"""FROM maven:3.8-openjdk-11 AS builder
-
-WORKDIR /app
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-COPY . .
-RUN mvn package -DskipTests
-
-FROM {base_image}
-WORKDIR /app
-
-COPY --from=builder /app/target/*.jar app.jar
-
-EXPOSE {port}
-
-CMD ["java", "-jar", "app.jar"]
-"""
-        else:
-            content = f"""FROM maven:3.8-openjdk-11
-
-WORKDIR /app
-
-COPY pom.xml .
-RUN mvn dependency:go-offline
-
-COPY . .
-RUN mvn package -DskipTests
-
-EXPOSE {port}
-
-CMD ["java", "-jar", "target/*.jar"]
-"""
-    else:
-        # Gradle project
-        content = f"""FROM {base_image}
-
-WORKDIR /app
-
-COPY . .
-RUN ./gradlew build
-
-EXPOSE {port}
-
-CMD ["java", "-jar", "build/libs/*.jar"]
-"""
-
-    return content
-
-
-def _generate_generic_dockerfile(analysis: ProjectAnalysis, port: int) -> str:
-    """Generate generic Dockerfile."""
-    content = f"""FROM alpine:latest
-
-WORKDIR /app
-
-COPY . .
-
-EXPOSE {port}
-
-CMD ["./app"]
-"""
-    return content
 
 
 async def save_dockerfile(project_path: Path, dockerfile_content: str) -> str:

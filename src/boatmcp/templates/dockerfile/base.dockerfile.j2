@@ -1,0 +1,13 @@
+{% block base %}
+FROM {{ base_image }}
+
+WORKDIR /app
+
+{% block setup %}{% endblock %}
+
+COPY . .
+
+EXPOSE {{ port }}
+
+{% block command %}{% endblock %}
+{% endblock %}
