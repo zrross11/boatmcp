@@ -1,4 +1,4 @@
-"""Helm-related schemas."""
+"""Kubernetes-related schemas (Helm and Minikube)."""
 
 from dataclasses import dataclass
 from pathlib import Path

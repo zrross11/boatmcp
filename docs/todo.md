@@ -2,6 +2,21 @@
 
 ## High Priority Features
 
+### LLM-Powered Analysis & Generation
+- [ ] **Refactor Scanner/Analyzer**: Replace rule-based project analysis with LLM-based understanding
+  - Integrate mlx-community package from HuggingFace for local LLM inference
+  - Read all files within a given path and send to LLM context window for comprehensive analysis
+  - Use LLM to detect project type, language, framework, dependencies, and deployment requirements
+- [ ] **LLM-Generated Dockerfiles**: Refactor Dockerfile generation to use LLM recommendations
+  - Replace template-based generation with intelligent LLM-powered creation
+  - LLM should analyze codebase and generate optimized Dockerfiles based on actual code patterns
+- [ ] **LLM-Generated Helm Charts**: Refactor Helm chart generation to use LLM recommendations
+  - Replace template-based generation with intelligent LLM-powered creation
+  - LLM should understand application architecture and generate appropriate Kubernetes manifests
+- [ ] **Smart Retry Mechanism**: Implement intelligent retry for LLM generations when workflow steps fail
+  - MCP server should detect downstream failures and retry LLM generation with failure context
+  - Learn from failures to improve subsequent generation attempts
+
 ### Container Image Management
 - [ ] **Image Loading Function**: Create a new function to load Docker images into minikube
   - Should support loading from local Docker daemon into minikube
