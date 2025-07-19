@@ -1,16 +1,13 @@
-"""Minikube-related MCP tools."""
+"""Minikube cluster management functionality."""
 
 import subprocess
-from typing import Any
-
-from fastmcp import FastMCP
 
 
-def register_minikube_tools(mcp: FastMCP[Any]) -> None:
-    """Register all Minikube-related MCP tools."""
-    
-    @mcp.tool()
-    async def create_minikube_cluster(
+class MinikubeManager:
+    """Service for managing Minikube clusters."""
+
+    async def create_cluster(
+        self,
         profile: str = "boatmcp-cluster",
         cpus: int = 2,
         memory: str = "2048mb",
@@ -46,19 +43,19 @@ def register_minikube_tools(mcp: FastMCP[Any]) -> None:
                 # Switch to the created cluster profile
                 profile_cmd = ["minikube", "profile", profile]
                 profile_result = subprocess.run(profile_cmd, capture_output=True, text=True, timeout=30)
-                
+
                 output = []
                 output.append(f"✅ Minikube cluster '{profile}' created successfully!")
                 output.append(f"🖥️  Driver: {driver}")
                 output.append(f"💻 CPUs: {cpus}")
                 output.append(f"💾 Memory: {memory}")
                 output.append(f"💿 Disk: {disk_size}")
-                
+
                 if profile_result.returncode == 0:
                     output.append(f"🔄 Switched to profile '{profile}' as active cluster")
                 else:
                     output.append(f"⚠️  Warning: Failed to switch to profile '{profile}': {profile_result.stderr}")
-                
+
                 output.append("\n📋 Cluster details:")
                 output.append(result.stdout)
                 return "\n".join(output)
@@ -70,8 +67,7 @@ def register_minikube_tools(mcp: FastMCP[Any]) -> None:
         except Exception as e:
             return f"❌ Error creating minikube cluster '{profile}': {str(e)}"
 
-    @mcp.tool()
-    async def delete_minikube_cluster(profile: str, purge: bool = False) -> str:
+    async def delete_cluster(self, profile: str, purge: bool = False) -> str:
         """
         Delete a minikube cluster.
 

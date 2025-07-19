@@ -2,7 +2,7 @@
 
 import subprocess
 
-from boatmcp.schemas.helm import HelmDeploymentRequest, HelmDeploymentResult
+from .schemas import HelmDeploymentRequest, HelmDeploymentResult
 
 
 class HelmDeployer:

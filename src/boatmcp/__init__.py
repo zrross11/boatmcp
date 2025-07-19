@@ -2,6 +2,11 @@
 
 __version__ = "0.1.0"
 
+from .core import create_mcp_server, run_server
 from .main import main as run
 
-__all__ = ["run"]
+__all__ = [
+    "create_mcp_server",
+    "run_server",
+    "run",
+]

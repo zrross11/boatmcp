@@ -7,39 +7,12 @@ from unittest.mock import patch
 
 import pytest
 
-from boatmcp.schemas.helm import (
+from boatmcp.kubernetes import (
+    HelmDeployer,
     HelmDeploymentRequest,
     HelmGenerationRequest,
+    HelmGenerator,
 )
-from boatmcp.schemas.repository import FileInfo, ProjectAnalysis
-from boatmcp.services.helm.helm_deployer import HelmDeployer
-from boatmcp.services.helm.helm_generator import HelmGenerator
-
-
-def get_mock_repository_analysis(
-    overrides: dict[str, Any] | None = None
-) -> ProjectAnalysis:
-    """Create a mock repository analysis with sensible defaults."""
-    base_analysis = ProjectAnalysis(
-        root_path=Path("/test/project"),
-        project_type="python",
-        language="python",
-        framework="fastapi",
-        package_manager="pip",
-        dependencies=["fastapi", "uvicorn"],
-        entry_points=["app.py"],
-        source_files=[
-            FileInfo(path=Path("/test/project/app.py"), size=1000)
-        ],
-        config_files=[
-            FileInfo(path=Path("/test/project/requirements.txt"), size=100)
-        ],
-        static_files=[]
-    )
-
-    if overrides:
-        return replace(base_analysis, **overrides)
-    return base_analysis
 
 
 def get_mock_helm_request(
@@ -85,13 +58,12 @@ class TestHelmGenerator:
         project_path = tmp_path / "test-project"
         project_path.mkdir()
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({
             "project_path": project_path,
             "chart_name": "test-app"
         })
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         assert result.chart_path == project_path / "helm" / "test-app"
@@ -106,14 +78,13 @@ class TestHelmGenerator:
         project_path = tmp_path / "test-project"
         project_path.mkdir()
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({
             "project_path": project_path,
             "chart_name": "my-app",
             "app_version": "2.0.0"
         })
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         chart_yaml = (project_path / "helm" / "my-app" / "Chart.yaml").read_text()
@@ -127,14 +98,13 @@ class TestHelmGenerator:
         project_path = tmp_path / "test-project"
         project_path.mkdir()
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({
             "project_path": project_path,
             "image_name": "custom-app",
             "image_tag": "v1.2.3"
         })
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         values_yaml = (project_path / "helm" / "test-app" / "values.yaml").read_text()
@@ -147,10 +117,9 @@ class TestHelmGenerator:
         project_path = tmp_path / "test-project"
         project_path.mkdir()
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({"project_path": project_path})
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         deployment_path = project_path / "helm" / "test-app" / "templates" / "deployment.yaml"
@@ -165,10 +134,9 @@ class TestHelmGenerator:
         project_path = tmp_path / "test-project"
         project_path.mkdir()
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({"project_path": project_path})
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         service_path = project_path / "helm" / "test-app" / "templates" / "service.yaml"
@@ -187,10 +155,9 @@ class TestHelmGenerator:
         helm_dir.mkdir(parents=True)
         (helm_dir / "Chart.yaml").write_text("old content")
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({"project_path": project_path})
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         chart_content = (helm_dir / "Chart.yaml").read_text()
@@ -203,13 +170,12 @@ class TestHelmGenerator:
         project_path = tmp_path / "test-project"
         project_path.mkdir()
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({
             "project_path": project_path,
             "port": 8080
         })
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert result.success
         values_content = (project_path / "helm" / "test-app" / "values.yaml").read_text()
@@ -220,10 +186,9 @@ class TestHelmGenerator:
         """Test error handling when project path doesn't exist."""
         project_path = tmp_path / "nonexistent"
 
-        analysis = get_mock_repository_analysis({"root_path": project_path})
         request = get_mock_helm_request({"project_path": project_path})
 
-        result = await helm_generator.generate_helm_chart(request, analysis)
+        result = await helm_generator.generate_helm_chart(request)
 
         assert not result.success
         assert result.error is not None and "Project path does not exist" in result.error

@@ -1,21 +1,24 @@
-"""Helm-related MCP tools."""
+"""Kubernetes-related MCP tools (Helm and Minikube)."""
 
 from pathlib import Path
 from typing import Any
 
 from fastmcp import FastMCP
 
-from ..schemas.helm import HelmDeploymentRequest, HelmGenerationRequest
-from ..services.helm import HelmDeployer, HelmGenerator
+from .deployer import HelmDeployer
+from .helm import HelmGenerator
+from .minikube import MinikubeManager
+from .schemas import HelmDeploymentRequest, HelmGenerationRequest
 
 
-def register_helm_tools(mcp: FastMCP[Any]) -> None:
-    """Register all Helm-related MCP tools."""
-    
+def register_kubernetes_tools(mcp: FastMCP[Any]) -> None:
+    """Register all Kubernetes-related MCP tools."""
+
     # Initialize services
     helm_generator = HelmGenerator()
     helm_deployer = HelmDeployer()
-    
+    minikube_manager = MinikubeManager()
+
     @mcp.tool()
     async def generate_helm_chart(
         project_path: str,
@@ -187,3 +190,46 @@ def register_helm_tools(mcp: FastMCP[Any]) -> None:
 
         except Exception as e:
             return f"❌ Error uninstalling Helm chart: {str(e)}"
+
+    @mcp.tool()
+    async def create_minikube_cluster(
+        profile: str = "boatmcp-cluster",
+        cpus: int = 2,
+        memory: str = "2048mb",
+        disk_size: str = "20gb",
+        driver: str = "docker"
+    ) -> str:
+        """
+        Create a new minikube cluster for local Kubernetes development.
+
+        Args:
+            profile: Name of the minikube profile/cluster
+            cpus: Number of CPUs to allocate
+            memory: Amount of memory to allocate
+            disk_size: Disk size for the cluster
+            driver: Minikube driver to use (docker, virtualbox, etc.)
+
+        Returns:
+            Status message with cluster creation results
+        """
+        return await minikube_manager.create_cluster(
+            profile=profile,
+            cpus=cpus,
+            memory=memory,
+            disk_size=disk_size,
+            driver=driver
+        )
+
+    @mcp.tool()
+    async def delete_minikube_cluster(profile: str, purge: bool = False) -> str:
+        """
+        Delete a minikube cluster.
+
+        Args:
+            profile: Name of the minikube profile/cluster to delete
+            purge: Whether to purge all cached images and configs
+
+        Returns:
+            Status message with deletion results
+        """
+        return await minikube_manager.delete_cluster(profile=profile, purge=purge)

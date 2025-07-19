@@ -2,29 +2,6 @@
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-
-
-@dataclass(frozen=True)
-class DockerfileInstruction:
-    """A single Dockerfile instruction."""
-    instruction: str
-    arguments: str
-    comment: str | None = None
-
-
-@dataclass(frozen=True)
-class DockerfileTemplate:
-    """Template for generating Dockerfiles."""
-    base_image: str
-    instructions: list[DockerfileInstruction]
-    metadata: dict[str, Any]
-
-    def __post_init__(self) -> None:
-        if self.instructions is None:
-            object.__setattr__(self, 'instructions', [])
-        if self.metadata is None:
-            object.__setattr__(self, 'metadata', {})
 
 
 @dataclass(frozen=True)

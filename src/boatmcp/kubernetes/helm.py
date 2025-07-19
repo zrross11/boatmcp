@@ -1,8 +1,6 @@
 """Helm chart generation service."""
 
-
-from boatmcp.schemas.helm import HelmGenerationRequest, HelmGenerationResult
-# from boatmcp.schemas.repository import ProjectAnalysis
+from .schemas import HelmGenerationRequest, HelmGenerationResult
 
 
 class HelmGenerator:

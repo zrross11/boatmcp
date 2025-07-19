@@ -7,11 +7,13 @@ from typing import Any
 from fastmcp import FastMCP
 
 from ..utils import read_project_files
+from .generator import DockerfileGenerator
+from .schemas import DockerfileGenerationRequest
 
 
 def register_docker_tools(mcp: FastMCP[Any]) -> None:
     """Register all Docker-related MCP tools."""
-    
+
     @mcp.tool()
     async def analyze_project(project_path: str) -> str:
         """
@@ -26,10 +28,10 @@ def register_docker_tools(mcp: FastMCP[Any]) -> None:
         try:
             # Ensure we're working with absolute path
             abs_project_path = Path(project_path).resolve()
-            
+
             if not abs_project_path.exists():
                 return f"❌ Project path does not exist: {project_path}"
-            
+
             if not abs_project_path.is_dir():
                 return f"❌ Project path is not a directory: {project_path}"
 
@@ -48,12 +50,12 @@ def register_docker_tools(mcp: FastMCP[Any]) -> None:
             has_package_json = False
             has_go_mod = False
             has_cargo_toml = False
-            
+
             for file_path in project_files.keys():
                 if "." in file_path:
                     ext = "." + file_path.split(".")[-1]
                     file_extensions.add(ext)
-                
+
                 if file_path.lower() == "requirements.txt":
                     has_requirements_txt = True
                 elif file_path.lower() == "package.json":
@@ -81,16 +83,16 @@ def register_docker_tools(mcp: FastMCP[Any]) -> None:
             output.append(f"🏷️  **Detected Type:** {project_type}")
             output.append(f"📊 **Files Found:** {len(project_files)}")
             output.append(f"📋 **Extensions:** {', '.join(sorted(file_extensions))}")
-            
+
             output.append("\n📄 **Project Files:**")
             output.append("=" * 60)
-            
+
             for file_path, content in project_files.items():
                 output.append(f"\n**{file_path}:**")
                 output.append("```")
                 output.append(content.strip())
                 output.append("```")
-            
+
             output.append("=" * 60)
             output.append("\n💡 **Next Steps:**")
             output.append("Based on this analysis, please generate a production-ready Dockerfile.")
@@ -116,16 +118,16 @@ def register_docker_tools(mcp: FastMCP[Any]) -> None:
         try:
             # Ensure we're working with absolute path
             abs_project_path = Path(project_path).resolve()
-            
+
             if not abs_project_path.exists():
                 return f"❌ Project path does not exist: {project_path}"
-            
+
             if not abs_project_path.is_dir():
                 return f"❌ Project path is not a directory: {project_path}"
 
             # Write Dockerfile to project root
             dockerfile_path = abs_project_path / "Dockerfile"
-            
+
             with open(dockerfile_path, 'w', encoding='utf-8') as f:
                 f.write(dockerfile_content)
 
@@ -133,6 +135,71 @@ def register_docker_tools(mcp: FastMCP[Any]) -> None:
 
         except Exception as e:
             return f"❌ Error saving Dockerfile: {str(e)}"
+
+    @mcp.tool()
+    async def generate_dockerfile(
+        project_path: str,
+        optimize_for_size: bool = False,
+        multi_stage: bool = False,
+        custom_instructions: list[str] | None = None,
+        save_to_project: bool = True
+    ) -> str:
+        """
+        Generate a Dockerfile for a project with automatic project type detection.
+
+        Args:
+            project_path: Path to the project root directory
+            optimize_for_size: Whether to optimize the Dockerfile for smaller image size
+            multi_stage: Whether to use multi-stage builds (where applicable)
+            custom_instructions: Optional list of custom Dockerfile instructions to append
+            save_to_project: Whether to save the Dockerfile to the project directory
+
+        Returns:
+            Generated Dockerfile content and status information
+        """
+        try:
+            # Ensure we're working with absolute path
+            abs_project_path = Path(project_path).resolve()
+
+            if not abs_project_path.exists():
+                return f"❌ Project path does not exist: {project_path}"
+
+            if not abs_project_path.is_dir():
+                return f"❌ Project path is not a directory: {project_path}"
+
+            # Create generation request
+            output_path = abs_project_path / "Dockerfile" if save_to_project else None
+            request = DockerfileGenerationRequest(
+                project_path=abs_project_path,
+                output_path=output_path,
+                custom_instructions=custom_instructions or [],
+                optimize_for_size=optimize_for_size,
+                multi_stage=multi_stage
+            )
+
+            # Generate Dockerfile
+            generator = DockerfileGenerator()
+            result = await generator.generate_dockerfile(request)
+
+            if result.success:
+                output = []
+                output.append("✅ Dockerfile generated successfully!")
+                output.append(f"📁 Project: {abs_project_path}")
+
+                if save_to_project:
+                    output.append(f"💾 Saved to: {result.dockerfile_path}")
+
+                output.append("\n📄 Generated Dockerfile:")
+                output.append("=" * 50)
+                output.append(result.dockerfile_content or "")
+                output.append("=" * 50)
+
+                return "\n".join(output)
+            else:
+                return f"❌ Failed to generate Dockerfile: {result.error}"
+
+        except Exception as e:
+            return f"❌ Error generating Dockerfile: {str(e)}"
 
     @mcp.tool()
     async def build_docker_image(
