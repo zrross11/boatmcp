@@ -64,7 +64,7 @@ git clone <repository-url>
 cd boatmcp
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv add fastmcp httpx
+uv sync
 ```
 
 ### 2. Verify Tool Installation
