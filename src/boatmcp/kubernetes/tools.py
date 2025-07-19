@@ -233,3 +233,23 @@ def register_kubernetes_tools(mcp: FastMCP[Any]) -> None:
             Status message with deletion results
         """
         return await minikube_manager.delete_cluster(profile=profile, purge=purge)
+
+    @mcp.tool()
+    async def load_image_into_minikube(
+        image_name: str,
+        profile: str = "boatmcp-cluster"
+    ) -> str:
+        """
+        Load a locally built Docker image into a minikube cluster.
+
+        Args:
+            image_name: Name and tag of the Docker image to load (e.g., "my-app:latest")
+            profile: Name of the minikube profile/cluster to load the image into
+
+        Returns:
+            Status message with image loading results
+        """
+        return await minikube_manager.load_image_into_cluster(
+            image_name=image_name,
+            profile=profile
+        )

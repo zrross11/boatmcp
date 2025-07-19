@@ -100,3 +100,39 @@ class MinikubeManager:
             return f"❌ Timeout deleting minikube cluster '{profile}' (exceeded 2 minutes)"
         except Exception as e:
             return f"❌ Error deleting minikube cluster '{profile}': {str(e)}"
+
+    async def load_image_into_cluster(
+        self,
+        image_name: str,
+        profile: str = "boatmcp-cluster"
+    ) -> str:
+        """
+        Load a locally built Docker image into a minikube cluster.
+
+        Args:
+            image_name: Name and tag of the Docker image to load (e.g., "my-app:latest")
+            profile: Name of the minikube profile/cluster to load the image into
+
+        Returns:
+            Status message with image loading results
+        """
+        try:
+            cmd = ["minikube", "image", "load", image_name, "--profile", profile]
+
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+
+            if result.returncode == 0:
+                output = []
+                output.append(f"✅ Image '{image_name}' loaded successfully into cluster '{profile}'!")
+                output.append(f"📁 Profile: {profile}")
+                output.append(f"🐳 Image: {image_name}")
+                output.append("\n📋 Load details:")
+                output.append(result.stdout)
+                return "\n".join(output)
+            else:
+                return f"❌ Failed to load image '{image_name}' into cluster '{profile}': {result.stderr}"
+
+        except subprocess.TimeoutExpired:
+            return f"❌ Timeout loading image '{image_name}' into cluster '{profile}' (exceeded 3 minutes)"
+        except Exception as e:
+            return f"❌ Error loading image '{image_name}' into cluster '{profile}': {str(e)}"
