@@ -1,0 +1,10 @@
+{% extends "base.dockerfile.j2" %}
+
+{% block setup %}
+COPY package*.json ./
+RUN npm ci --only=production
+{% endblock %}
+
+{% block command %}
+CMD ["node", "{{ main_file }}"]
+{% endblock %}

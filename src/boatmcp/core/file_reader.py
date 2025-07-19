@@ -43,7 +43,7 @@ def read_file(file_path: str) -> str:
         raise ValueError(f"File too large (max {MAX_FILE_SIZE // 1024}KB): {file_path}")
 
     # Read file content
-    with open(path, encoding='utf-8') as f:
+    with open(path, encoding="utf-8") as f:
         return f.read()
 
 
@@ -84,7 +84,7 @@ def read_directory(directory_path: str) -> dict[str, str]:
                     continue
 
                 # Read file content
-                with open(item, encoding='utf-8') as f:
+                with open(item, encoding="utf-8") as f:
                     content = f.read()
                     files_content[item.name] = content
                     files_read += 1
@@ -140,7 +140,7 @@ def read_project_files(project_path: str) -> dict[str, str]:
                     continue
 
                 # Read file content
-                with open(file_path, encoding='utf-8') as f:
+                with open(file_path, encoding="utf-8") as f:
                     content = f.read()
 
                 # Use relative path as key

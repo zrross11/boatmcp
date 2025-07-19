@@ -1,0 +1,10 @@
+{% extends "base.dockerfile.j2" %}
+
+{% block setup %}
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+{% endblock %}
+
+{% block command %}
+CMD ["python", "{{ main_file }}"]
+{% endblock %}
