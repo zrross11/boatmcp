@@ -6,7 +6,6 @@ from ...schemas.docker import (
     DockerfileInstruction,
     DockerfileTemplate,
 )
-from ...schemas.repository import ProjectAnalysis
 
 
 class DockerfileGenerator:
@@ -51,7 +50,7 @@ class DockerfileGenerator:
             "unknown": self._generate_generic_dockerfile
         }
 
-    async def generate_dockerfile(self, request: DockerfileGenerationRequest, analysis: ProjectAnalysis) -> DockerfileGenerationResult:
+    async def generate_dockerfile(self, request: DockerfileGenerationRequest, analysis: None = None) -> DockerfileGenerationResult:
         """Generate a Dockerfile based on project analysis."""
         try:
             # Get appropriate template generator

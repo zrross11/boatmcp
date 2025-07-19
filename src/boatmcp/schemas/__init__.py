@@ -12,12 +12,8 @@ from .helm import (
     HelmGenerationRequest,
     HelmGenerationResult,
 )
-from .repository import FileInfo, ProjectAnalysis, ScanResult
 
 __all__ = [
-    "FileInfo",
-    "ProjectAnalysis",
-    "ScanResult",
     "DockerfileInstruction",
     "DockerfileTemplate",
     "DockerfileGenerationRequest",

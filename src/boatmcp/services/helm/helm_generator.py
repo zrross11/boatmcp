@@ -2,7 +2,7 @@
 
 
 from boatmcp.schemas.helm import HelmGenerationRequest, HelmGenerationResult
-from boatmcp.schemas.repository import ProjectAnalysis
+# from boatmcp.schemas.repository import ProjectAnalysis
 
 
 class HelmGenerator:
@@ -11,7 +11,7 @@ class HelmGenerator:
     async def generate_helm_chart(
         self,
         request: HelmGenerationRequest,
-        analysis: ProjectAnalysis
+        analysis: None = None
     ) -> HelmGenerationResult:
         """Generate a Helm chart for the given project."""
         try:
