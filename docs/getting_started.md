@@ -52,9 +52,15 @@ This guide outlines all the tooling dependencies needed to run BoatMCP and test 
   ```
 
 ### MCP Client
-- **Claude Desktop** - Primary MCP client for testing
+Choose one of these MCP-compatible clients:
+
+- **Claude Desktop** - Standalone AI assistant
   - [Download Claude Desktop](https://claude.ai/download)
   - Requires Claude subscription for full functionality
+
+- **Cursor IDE** - AI-powered code editor with built-in MCP support
+  - [Download Cursor IDE](https://cursor.sh)
+  - Integrates seamlessly with your development workflow
 
 ## Setup Instructions
 
@@ -67,7 +73,31 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 uv sync
 ```
 
-### 2. Verify Tool Installation
+### 2. Create Configuration File
+Create a `config.yaml` file in the project root:
+
+```yaml
+# BoatMCP Configuration
+server:
+  # Set to true for development/testing to access internal tools
+  internal_tools: false
+  transport: "stdio"
+
+tools:
+  docker:
+    enabled: true
+  kubernetes:
+    enabled: true
+    default_minikube_profile: "boatmcp-cluster"
+  workflows:
+    enabled: true
+```
+
+**Configuration Options:**
+- `internal_tools: false` - Production mode (recommended for daily use)
+- `internal_tools: true` - Development mode (exposes additional debugging tools)
+
+### 3. Verify Tool Installation
 ```bash
 # Check Python version
 python --version  # Should be 3.11+
@@ -89,7 +119,9 @@ kubectl version --client
 helm version
 ```
 
-### 3. Configure Claude Desktop
+### 4. Configure MCP Client
+
+#### Option A: Claude Desktop
 Edit the configuration file at:
 - **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows**: `%APPDATA%/Claude/claude_desktop_config.json`
@@ -112,11 +144,32 @@ Add the MCP server configuration:
 }
 ```
 
+#### Option B: Cursor IDE
+1. Open Cursor IDE
+2. Go to **Settings** → **Features** → **Enable Model Context Protocol (MCP)**
+3. Configure BoatMCP server in the MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "boatmcp": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/full/path/to/your/boatmcp/directory",
+        "run",
+        "boatmcp"
+      ]
+    }
+  }
+}
+```
+
 **Important:** Replace `<username>` and `/full/path/to/your/boatmcp/directory` with actual values.
 
-### 4. Test the Setup
+### 5. Test the Setup
 ```bash
-# Start the MCP server
+# Test BoatMCP server starts correctly
 uv run boatmcp
 
 # In another terminal, test minikube
@@ -126,6 +179,35 @@ minikube start --driver=docker
 minikube status
 minikube stop
 minikube delete
+```
+
+## Configuration Modes
+
+### Production Mode (Default)
+```yaml
+server:
+  internal_tools: false
+```
+- **Use for**: Daily development work
+- **Available tools**: Core workflow and cluster management
+- **Benefits**: Clean interface, essential tools only
+
+### Development Mode
+```yaml
+server:
+  internal_tools: true
+```
+- **Use for**: Debugging, learning, advanced workflows
+- **Available tools**: All tools including project analysis, individual Docker/Helm operations
+- **Benefits**: Fine-grained control, step-by-step debugging
+
+You can switch modes by editing `config.yaml` or using a custom config file:
+```bash
+# Use development config
+uv run boatmcp config.dev.yaml
+
+# Use production config (default)
+uv run boatmcp
 ```
 
 ## Optional Tools
@@ -144,6 +226,30 @@ minikube delete
 
 Once all dependencies are installed and configured:
 
-1. Follow the [Test Prompt Guide](prompt.md) to verify functionality
-2. Review the [TODO List](todo.md) for upcoming features
-3. Refer to the main [CLAUDE.md](../CLAUDE.md) for development guidelines
+1. **Test Basic Functionality**: Follow the [Test Prompt Guide](prompt.md) to verify everything works
+2. **Start Development**: Review the [Development Guidelines](../CLAUDE.md) for coding standards
+3. **Deploy Your First App**: Use BoatMCP to deploy the included example applications
+
+## Troubleshooting
+
+### Common Issues
+
+**MCP Server Not Starting:**
+- Ensure `config.yaml` exists and has valid YAML syntax
+- Check that all dependencies are installed: `uv sync`
+- Verify Python version is 3.11+
+
+**Docker Issues:**
+- Make sure Docker Desktop is running
+- Test with: `docker run hello-world`
+
+**Minikube Issues:**
+- Check virtualization is enabled on your system
+- Try different driver: `minikube start --driver=virtualbox`
+
+**Configuration Not Loading:**
+- Ensure `config.yaml` is in the directory where you run `uv run boatmcp`
+- Check file permissions and syntax
+- Use `uv run boatmcp --help` to see available options
+
+Need help? Check the project issues or create a new one with your setup details.

@@ -1,0 +1,26 @@
+# BoatMCP Configuration File
+# This file controls server behavior and feature flags
+
+# Server configuration
+server:
+  # Enable internal development tools (for testing and development)
+  # This replaces the BOATMCP_INTERNAL_TOOLS environment variable
+  internal_tools: false
+  
+  # MCP server settings
+  transport: "stdio"
+  
+# Tool configurations
+tools:
+  # Docker tool settings
+  docker:
+    enabled: true
+    
+  # Kubernetes tool settings  
+  kubernetes:
+    enabled: true
+    default_minikube_profile: "boatmcp-cluster"
+    
+  # Workflow tool settings
+  workflows:
+    enabled: true 

@@ -1,23 +1,23 @@
 """Docker-related MCP tools."""
 
-import os
 import subprocess
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastmcp import FastMCP
+
+if TYPE_CHECKING:
+    from ..core.config import BoatMCPConfig
 
 from ..core.analysis import ProjectAnalysis, analyze_project, format_analysis_with_files
 from .generator import generate_dockerfile_content, save_dockerfile
 
 
-def register_docker_tools(mcp: FastMCP[Any]) -> None:
+def register_docker_tools(mcp: FastMCP[Any], config: "BoatMCPConfig") -> None:
     """Register all Docker-related MCP tools."""
 
-    # Check if internal tools should be enabled
-    enable_internal_tools = (
-        os.getenv("BOATMCP_INTERNAL_TOOLS", "false").lower() == "true"
-    )
+    # Use config instead of environment variable
+    enable_internal_tools = config.internal_tools
 
     # Internal tools (gated behind environment variable)
     if enable_internal_tools:

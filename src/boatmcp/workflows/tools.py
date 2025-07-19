@@ -1,22 +1,22 @@
 """MCP tools for workflow orchestration."""
 
-import os
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from fastmcp import FastMCP
+
+if TYPE_CHECKING:
+    from ..core.config import BoatMCPConfig
 
 from .deployment import MinikubeDeploymentWorkflow
 from .schemas import DeploymentWorkflowRequest
 
 
-def register_workflow_tools(mcp: FastMCP[Any]) -> None:
+def register_workflow_tools(mcp: FastMCP[Any], config: "BoatMCPConfig") -> None:
     """Register workflow-related MCP tools."""
 
-    # Check if internal tools should be enabled
-    enable_internal_tools = (
-        os.getenv("BOATMCP_INTERNAL_TOOLS", "false").lower() == "true"
-    )
+    # Use config instead of environment variable
+    enable_internal_tools = config.internal_tools
 
     workflow_manager = MinikubeDeploymentWorkflow()
 

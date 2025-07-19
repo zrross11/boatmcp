@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 BoatMCP is an MCP (Model Context Protocol) server designed to help developers ship code from local development to production using natural language interactions with an LLM client. 
 
-**Mission Statement:** BoatMCP's mission is to eliminate the friction between "it works on my machine" and "it works in production" by providing intelligent tooling that guides developers through deployment workflows using plain English conversations with Claude or other MCP-compatible LLMs.
+**Mission Statement:** BoatMCP's mission is to eliminate the friction between "it works on my machine" and "it works in production" by providing intelligent tooling that guides developers through deployment workflows using plain English conversations with Claude, Cursor, or other MCP-compatible LLMs.
 
 The core purpose of BoatMCP is to allow developers to describe their deployment goals in natural language, enabling them to go from local repository to production in the cloud through LLM-guided workflows. This includes generating Dockerfiles, building container images, provisioning cloud infrastructure, and managing Kubernetes deployments. The system interprets natural language requests and provides step-by-step guidance to deploy software correctly and efficiently.
 
@@ -21,16 +21,36 @@ The core purpose of BoatMCP is to allow developers to describe their deployment 
 ```bash
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-uv add fastmcp2.0 httpx
+uv sync --extra dev --extra test
+```
+
+**Configuration:**
+Create a `config.yaml` file in the project root:
+```yaml
+# BoatMCP Configuration
+server:
+  internal_tools: false  # Set to true for development
+  transport: "stdio"
+
+tools:
+  docker:
+    enabled: true
+  kubernetes:
+    enabled: true
+    default_minikube_profile: "boatmcp-cluster"
+  workflows:
+    enabled: true
 ```
 
 **Run the FastMCP server:**
 ```bash
-uv run main.py
+uv run boatmcp
 ```
 
-**Test with Claude Desktop:**
-The server runs as an MCP server via stdio transport. Configure in Claude Desktop's config file at `/Users/<username>/Library/Application Support/Claude/claude_desktop_config.json`.
+**Test with MCP Clients:**
+The server runs as an MCP server via stdio transport. Configure in:
+- **Claude Desktop**: `/Users/<username>/Library/Application Support/Claude/claude_desktop_config.json`
+- **Cursor IDE**: Settings → Features → Enable Model Context Protocol (MCP)
 
 **Critical Dependency Note:**
 This project uses **fastmcp2.0** from [https://github.com/jlowin/fastmcp](https://github.com/jlowin/fastmcp). When implementing new features or modifying existing code, ensure that all interactions with MCP functionality are routed through this specific library.
@@ -39,13 +59,18 @@ This project uses **fastmcp2.0** from [https://github.com/jlowin/fastmcp](https:
 
 The project follows a modular MCP server architecture designed to bridge the gap between natural language requests and infrastructure deployment:
 
-- **main.py**: MCP server entrypoint that registers all tools using fastmcp2.0
-- **app/**: Application modules containing domain-specific functionality
-  - **minikube/**: Kubernetes cluster management via minikube commands
-    - **minikube.py**: Core minikube operations (create/delete clusters)
-    - **__init__.py**: Module exports
+**Core Structure:**
+- **src/boatmcp/main.py**: Entry point that loads configuration and starts the MCP server
+- **src/boatmcp/core/**: Core infrastructure including configuration management and server setup
+  - **config.py**: Configuration loading from YAML files with fallback to environment variables
+  - **server.py**: MCP server setup and tool registration
+  - **types.py**: Common type definitions
+- **src/boatmcp/docker/**: Docker operations and Dockerfile generation
+- **src/boatmcp/kubernetes/**: Kubernetes cluster management and Helm operations
+- **src/boatmcp/workflows/**: High-level deployment workflow orchestration
 
 **Key Design Patterns:**
+- Configuration-driven tool availability using `config.yaml`
 - MCP tools are implemented as async functions and registered via decorators
 - Infrastructure commands are wrapped with error handling and timeout protection
 - All tools return structured responses with success/failure status
@@ -55,22 +80,42 @@ The project follows a modular MCP server architecture designed to bridge the gap
 - Uses fastmcp2.0 framework for rapid MCP server development
 - Tools are automatically exposed to MCP clients when decorated with `@fastmcp.tool()`
 - Server communicates via stdio transport protocol
-- Designed to work seamlessly with Claude Desktop and other MCP-compatible clients
+- Designed to work seamlessly with Claude Desktop, Cursor IDE, and other MCP-compatible clients
 
 ## Dependencies
 
 **Core Dependencies (pyproject.toml):**
 - `httpx>=0.28.1` - HTTP client library
-- `fastmcp2.0` - Model Context Protocol implementation (v2.0 from jlowin/fastmcp)
+- `fastmcp @ git+https://github.com/jlowin/fastmcp` - Model Context Protocol implementation
+- `Jinja2>=3.1.4` - Template engine for file generation
+- `PyYAML>=6.0` - YAML configuration file parsing
+
+**Development Dependencies:**
+- `mypy>=1.17.0` - Static type checking
+- `ruff>=0.1.0` - Fast Python linter and formatter
+- `types-PyYAML>=6.0` - Type stubs for PyYAML
+- `pytest>=8.4.1` - Testing framework
 
 **System Dependencies:**
 - minikube binary must be available in PATH for Kubernetes functionality
+- Docker must be running for container operations
 
 ## Tool Functions
 
-**Minikube Management:**
-- `create_minikube_cluster()`: Creates new Kubernetes clusters with configurable resources
-- `delete_minikube_cluster()`: Removes clusters with optional purge functionality
+**Core Workflow:**
+- `minikube_deployment_workflow()`: Complete project-to-production deployment pipeline
+
+**Cluster Management:**
+- `manage_minikube_cluster()`: Creates, starts, stops, and deletes minikube clusters with configurable resources
+
+**Internal Tools (Development Mode):**
+When `internal_tools: true` in configuration:
+- `analyze_project()`: Detailed project analysis and technology recommendations
+- `generate_dockerfile()`: Creates optimized Dockerfiles based on project analysis
+- `build_docker_image()`: Builds and tags Docker images
+- `load_image_to_minikube()`: Loads images into minikube's Docker registry
+- `generate_helm_chart()`: Creates Kubernetes Helm charts
+- `deploy_helm_chart()`: Deploys applications using Helm
 
 All infrastructure operations include comprehensive error handling and user-friendly response formatting.
 
